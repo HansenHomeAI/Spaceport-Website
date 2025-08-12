@@ -1,0 +1,10 @@
+diff a/.github/workflows/deploy-cloudflare-pages.yml b/.github/workflows/deploy-cloudflare-pages.yml	(rejected hunks)
+@@ -4,7 +4,7 @@ on:
+   push:
+     branches:
+       - main
+-      - dev
++      - development
+ 
+ jobs:
+   deploy:

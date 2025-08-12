@@ -24,6 +24,7 @@
     "@types/node": "^20.19.9",
     "@types/react": "^18.3.23",
     "eslint": "^8.57.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "wrangler": "^4.28.1"
   }
 }

@@ -1,148 +1,4 @@
-name: Deploy to Cloudflare Pages
-
-on:
-  push:
-    branches:
-      - main
-      - dev
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web
-    env:
-      # Temporary: inlined credentials provided for troubleshooting
-      CLOUDFLARE_API_TOKEN: q0X2wh5trXUHFddDBHGPgnUg1G2Yu4zzwiCFUd5C
-      CLOUDFLARE_ACCOUNT_ID: 462d86d5639d37fe5a4a21b24c8289c7
-      CF_PAGES_PROJECT: v0-spaceport-website
-      CF_PAGES_PROJECT_DEV_OVERRIDE: ${{ secrets.CF_PAGES_PROJECT_DEV_OVERRIDE }}
-      CF_PAGES_PROJECT_PROD_OVERRIDE: ${{ secrets.CF_PAGES_PROJECT_PROD_OVERRIDE }}
-      CF_PAGES_PROJECT_PROD_FRESH: ${{ secrets.CF_PAGES_PROJECT_PROD_FRESH }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install deps
-        run: npm ci
-
-      - name: Build Next.js
-        run: npm run build
-
-      - name: Transform to Cloudflare (next-on-pages)
-        run: npx --yes @cloudflare/next-on-pages
-
-      - name: Show output tree
-        run: |
-          echo "Contents of .vercel/output:" && ls -la .vercel/output || true
-          echo "Contents of .vercel/output/static:" && ls -la .vercel/output/static || true
-          echo "Worker file (if present):" && (ls -la .vercel/output/static/_worker.js || true)
-
-      - name: Install Wrangler
-        run: npm i -g wrangler@4
-
-      - name: Wrangler auth check and project list
-        run: |
-          wrangler --version || true
-          wrangler whoami || true
-          echo "Account: ${CLOUDFLARE_ACCOUNT_ID}"
-          echo "Listing Pages projects:"
-          wrangler pages project list | cat || true
-
-      - name: Select Pages project
-        id: select_project
-        shell: bash
-        run: |
-          BRANCH=${GITHUB_REF_NAME}
-          PROJECT="$CF_PAGES_PROJECT"
-          if [[ "$BRANCH" == "main" ]]; then
-            # Force main to deploy to the clean production project for reliability during troubleshooting
-            PROJECT="v0-spaceport-website-prod-fresh"
-          else
-            if [[ -n "$CF_PAGES_PROJECT_DEV_OVERRIDE" ]]; then PROJECT="$CF_PAGES_PROJECT_DEV_OVERRIDE"; fi
-          fi
-          if [[ -z "$PROJECT" ]]; then
-            # Fallback to deterministic project name per branch
-            SAFE_BRANCH=$(echo "$BRANCH" | tr '/' '-')
-            PROJECT="spaceport-website-${SAFE_BRANCH}"
-          fi
-          echo "project=$PROJECT" >> $GITHUB_OUTPUT
-          echo "Resolved Pages project: $PROJECT"
-
-      - name: Ensure Pages project exists
-        if: steps.select_project.outputs.project != ''
-        env:
-          PROJECT: ${{ steps.select_project.outputs.project }}
-        run: |
-          if ! wrangler pages project list | awk '{print $1}' | grep -qx "$PROJECT"; then
-            echo "Project $PROJECT not found. Creating..."
-            wrangler pages project create "$PROJECT" --production-branch main || true
-            echo "Re-list projects after create:"
-            wrangler pages project list | cat || true
-          else
-            echo "Project $PROJECT exists."
-          fi
-
-      - name: Ensure Pages runtime flags
-        if: steps.select_project.outputs.project != ''
-        env:
-          PROJECT: ${{ steps.select_project.outputs.project }}
-        run: |
-          echo "Setting compatibility date and flags on project $PROJECT"
-          curl -fsS -X PATCH \
-            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            -H "Content-Type: application/json" \
-            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}" \
-            --data '{
-              "deployment_configs": {
-                "production": {
-                  "compatibility_date": "2025-08-09",
-                  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"]
-                },
-                "preview": {
-                  "compatibility_date": "2025-08-09",
-                  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"]
-                }
-              }
-            }' | cat || true
-
-      - name: Deploy to Cloudflare Pages
-        env:
-          PROJECT: ${{ steps.select_project.outputs.project }}
-        run: |
-          if [[ -z "$PROJECT" ]]; then echo "No CF Pages project resolved" && exit 1; fi
-          # Deploy full .vercel/output (recommended for next-on-pages)
-          test -f ./.vercel/output/static/_worker.js && echo "Found _worker.js in static" || (echo "_worker.js missing" && ls -la ./.vercel/output/static || true)
-          wrangler pages deploy ./.vercel/output \
-            --project-name "$PROJECT" \
-            --branch "${GITHUB_REF_NAME}" \
-            --commit-dirty=true
-
-      - name: Show deployments
-        if: always()
-        env:
-          PROJECT: ${{ steps.select_project.outputs.project }}
-        run: |
-          wrangler pages deployment list --project-name "$PROJECT" | cat
-
-      - name: Verify endpoints
-        env:
-          PROJECT: ${{ steps.select_project.outputs.project }}
-        run: |
-          HOST="https://$PROJECT.pages.dev"
-          echo "Verifying $HOST"
-          for path in "/" "/landing" "/about" "/pricing" "/create" "/signup" "/api/health"; do
-            echo "GET $HOST$path";
-            curl -fsS "$HOST$path" -H 'Accept: text/html,application/json' >/dev/null || (echo "Failed: $path" && curl -i "$HOST$path" && exit 1);
-          done
-
-name: Deploy Next.js to Cloudflare Pages (main & development)
+name: Deploy Next.js to Cloudflare Pages
 
 on:
   workflow_dispatch:
@@ -161,6 +17,18 @@ jobs:
         working-directory: web
     steps:
       - uses: actions/checkout@v4
+      - name: Select target Pages project per branch
+        id: select_project
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "main" ]; then
+            TARGET="v0-spaceport-website-prod-fresh"
+          else
+            TARGET="v0-spaceport-website-preview2"
+          fi
+          echo "CF_PAGES_PROJECT=$TARGET" >> $GITHUB_ENV
+          echo "project=$TARGET" >> $GITHUB_OUTPUT
+          echo "Using CF Pages project: $TARGET for branch $BRANCH"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -169,49 +37,103 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'web/package-lock.json'
 
-      - name: Install deps
-        run: npm ci || npm install
+      - name: Install deps (tolerant to peer conflicts in CI)
+        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
-      - name: Build Next for Cloudflare (dynamic)
+      - name: Build Next for Cloudflare (SSR)
         run: |
           npm run build
-          npm run cf:build
+          npx @cloudflare/next-on-pages
 
       - name: Debug .vercel/output contents
         run: |
           echo "Listing .vercel/output" && ls -la .vercel/output || true
-          echo "Functions manifest.json:" && cat .vercel/output/functions/manifest.json || true
-          echo "Functions dir:" && ls -la .vercel/output/functions || true
+          echo "Functions manifest.json:" && (cat .vercel/output/functions/manifest.json || true)
           echo "Static dir:" && ls -la .vercel/output/static || true
 
-      - name: Install Wrangler
-        run: npm install -g wrangler
+      - name: Upload .vercel/output for diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-output-${{ github.sha }}
+          path: .vercel/output
+          if-no-files-found: ignore
+          retention-days: 3
 
-      - name: Deploy to Cloudflare Pages (per-branch)
+      - name: Install Wrangler
+        run: npm i -g wrangler@4
+
+      - name: Ensure Pages runtime flags (compat date + node compat)
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_PAGES_PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
-          CF_PAGES_PROJECT_PROD_OVERRIDE: ${{ secrets.CF_PAGES_PROJECT_PROD_OVERRIDE }}
-          CF_PAGES_PROJECT_PROD_FRESH: ${{ secrets.CF_PAGES_PROJECT_PROD_FRESH }}
+        run: |
+          curl -fsS -X PATCH \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+             "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PAGES_PROJECT}" \
+            --data '{
+              "deployment_configs": {
+                "production": {
+                  "compatibility_date": "2025-08-09",
+                  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+                  "build_image_major_version": 3
+                },
+                "preview": {
+                  "compatibility_date": "2025-08-09",
+                  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+                  "build_image_major_version": 3
+                }
+              }
+            }' | cat
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           BRANCH="${{ github.ref_name }}"
-          # If the primary project is still in a bad Git-linked state, allow an override project
-          PROJECT_NAME="$CF_PAGES_PROJECT"
-          if [ -n "${{ secrets.CF_PAGES_PROJECT_DEV_OVERRIDE }}" ] && [ "$BRANCH" != "main" ]; then
-            PROJECT_NAME="${{ secrets.CF_PAGES_PROJECT_DEV_OVERRIDE }}"
-            # Use a clean preview environment alias to avoid legacy config on 'development'
-            BRANCH_ALIAS=dev-live
-          elif [ -n "$CF_PAGES_PROJECT_PROD_FRESH" ] && [ "$BRANCH" = "main" ]; then
-            PROJECT_NAME="$CF_PAGES_PROJECT_PROD_FRESH"
-            BRANCH_ALIAS="$BRANCH"
-          elif [ -n "$CF_PAGES_PROJECT_PROD_OVERRIDE" ] && [ "$BRANCH" = "main" ]; then
-            PROJECT_NAME="$CF_PAGES_PROJECT_PROD_OVERRIDE"
-            BRANCH_ALIAS="$BRANCH"
-          else
-            BRANCH_ALIAS="$BRANCH"
-          fi
-          echo "Deploying to project: $PROJECT_NAME (branch: $BRANCH)"
-          npx wrangler pages deploy .vercel/output \
-            --project-name "$PROJECT_NAME" \
-            --branch "$BRANCH_ALIAS"
+          # Deploy the static subdir so _worker.js sits at the upload root
+          npx wrangler pages deploy .vercel/output/static \
+            --project-name "$CF_PAGES_PROJECT" \
+            --branch "$BRANCH"
+
+      - name: Resolve latest deployment URLs (preview alias + hash URL)
+        id: resolve_urls
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="${{ github.ref_name }}"
+          # Get most recent deployment for the selected project (includes preview)
+          JSON=$(curl -fsSL -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PAGES_PROJECT}/deployments?per_page=1")
+          HASH_URL=$(echo "$JSON" | jq -r '.result[0].url')
+          DEPLOY_ID=$(echo "$JSON" | jq -r '.result[0].id')
+          # Fetch aliases for that deployment (branch alias if any)
+          DETAIL=$(curl -fsSL -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PAGES_PROJECT}/deployments/${DEPLOY_ID}")
+          ALIAS=$(echo "$DETAIL" | jq -r '.result.aliases[0] // empty')
+          echo "hash_url=$HASH_URL" >> $GITHUB_OUTPUT
+          echo "alias_url=$ALIAS" >> $GITHUB_OUTPUT
+          echo "Resolved: HASH=$HASH_URL ALIAS=${ALIAS:-<none>}"
+
+      - name: Verify preview alias and hash URL with retries
+        env:
+          HASH_URL: ${{ steps.resolve_urls.outputs.hash_url }}
+          ALIAS_URL: ${{ steps.resolve_urls.outputs.alias_url }}
+        run: |
+          set -e
+          urls=""
+          if [ -n "$ALIAS_URL" ]; then urls="$urls $ALIAS_URL"; fi
+          if [ -n "$HASH_URL" ]; then urls="$urls $HASH_URL"; fi
+          echo "Checking URLs: $urls"
+          for URL in $urls; do
+            echo "Probing $URL ..."
+            for i in $(seq 1 12); do
+              echo "Attempt $i"
+              if curl -fsS "$URL/health.txt" >/dev/null; then echo "OK $URL/health.txt"; break; fi
+              sleep 5
+              if [ $i -eq 12 ]; then echo "Timeout waiting for $URL"; exit 1; fi
+            done
+          done
