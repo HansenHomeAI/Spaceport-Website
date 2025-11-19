@@ -3,8 +3,9 @@
 SOGS Compression Only Test
 =========================
 
-Test script to validate PlayCanvas SOGS compression using the latest 3DGS training output.
-Uses the most recent successful 3DGS training run from July 31st with proper spherical harmonics.
+Test script to validate PlayCanvas SOGS compression using an existing 3DGS training output.
+By default it loads the latest metadata from tests/pipeline/latest_3dgs_output.json.
+You can override the source S3 URI via --source-uri or the LATEST_3DGS_OUTPUT_URI env.
 
 This test verifies:
 1. SOGS compression container is working
@@ -13,11 +14,13 @@ This test verifies:
 4. Output is compatible with SuperSplat viewer
 """
 
+import argparse
 import json
+import os
 import time
 import boto3
 import logging
-from datetime import datetime
+from pathlib import Path
 from typing import Dict, Optional
 
 # Configure logging
@@ -25,14 +28,19 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 class SOGSCompressionTester:
-    def __init__(self, region='us-west-2'):
+    def __init__(
+        self,
+        region: str = 'us-west-2',
+        source_uri: Optional[str] = None,
+        config_path: Optional[str] = None
+    ):
         self.region = region
         self.account_id = '975050048887'
         self.sagemaker = boto3.client('sagemaker', region_name=region)
         self.s3 = boto3.client('s3', region_name=region)
         
-        # Latest 3DGS training output (July 31st) - model.tar.gz contains the files with proper spherical harmonics
-        self.latest_3dgs_output = "s3://spaceport-ml-processing/3dgs/20f35078-d929-4f9f-9608-ad6235f713fe/ml-job-20250731-182052-20f35078-3dgs/output/model.tar.gz"
+        self.latest_metadata: Dict[str, str] = {}
+        self.latest_3dgs_output = self._resolve_latest_output(source_uri, config_path)
         
         # Configuration for SOGS compression test
         self.config = {
@@ -46,7 +54,7 @@ class SOGSCompressionTester:
         """Test SOGS compression with latest 3DGS output"""
         logger.info("🚀 STARTING SOGS COMPRESSION TEST")
         logger.info("=" * 60)
-        logger.info(f"Input: Latest 3DGS training output (July 31st) with proper spherical harmonics")
+        logger.info("Input: Latest 3DGS training output with proper spherical harmonics")
         logger.info(f"Source: {self.latest_3dgs_output}")
         logger.info(f"Container: PlayCanvas SOGS implementation")
         
@@ -120,6 +128,8 @@ class SOGSCompressionTester:
                 response = self.s3.head_object(Bucket=bucket, Key=key)
                 file_size_mb = response['ContentLength'] / (1024 * 1024)
                 logger.info(f"✅ Found model.tar.gz ({file_size_mb:.1f} MB)")
+                if self.latest_metadata:
+                    logger.info(f"📎 Output metadata: {json.dumps(self.latest_metadata, indent=2)}")
             except Exception as e:
                 logger.error(f"❌ model.tar.gz not found at {s3_uri}")
                 return False
@@ -143,7 +153,7 @@ class SOGSCompressionTester:
                 members = tar.getmembers()
                 
                 # Check for required files
-                required_files = ['final_model.ply', 'training_metadata.json']
+                required_files = ['training_metadata.json']
                 found_files = []
                 
                 for member in members:
@@ -152,13 +162,24 @@ class SOGSCompressionTester:
                         file_size_mb = member.size / (1024 * 1024)
                         logger.info(f"✅ Found {member.name} ({file_size_mb:.1f} MB)")
                 
-                if len(found_files) < len(required_files):
-                    missing = set(required_files) - set(found_files)
+                missing = set(required_files) - set(found_files)
+                if missing:
                     logger.error(f"❌ Missing required files in tar.gz: {missing}")
                     return False
                 
-                # Verify PLY file has correct format for SOGS
-                ply_path = os.path.join(temp_dir, 'final_model.ply')
+                # Locate the largest PLY file in the archive
+                ply_candidates = sorted(
+                    (Path(temp_dir) / member.name for member in members if member.name.endswith('.ply')),
+                    key=lambda p: p.stat().st_size if p.exists() else 0,
+                    reverse=True
+                )
+                
+                if not ply_candidates:
+                    logger.error("❌ No PLY files found inside model.tar.gz")
+                    return False
+                
+                ply_path = str(ply_candidates[0])
+                logger.info(f"✅ Selected PLY for compression: {ply_path}")
                 return self._verify_ply_format_local(ply_path)
             
         except Exception as e:
@@ -222,6 +243,48 @@ class SOGSCompressionTester:
         except Exception as e:
             logger.error(f"❌ Error verifying PLY format: {e}")
             return False
+
+    def _resolve_latest_output(self, source_uri: Optional[str], config_path: Optional[str]) -> str:
+        """Determine which 3DGS output URI should be used."""
+        if source_uri:
+            logger.info(f"📌 Using 3DGS output provided via CLI: {source_uri}")
+            return source_uri
+        
+        env_uri = os.environ.get("LATEST_3DGS_OUTPUT_URI")
+        if env_uri:
+            logger.info(f"📌 Using 3DGS output from LATEST_3DGS_OUTPUT_URI env: {env_uri}")
+            return env_uri
+        
+        config_uri = self._load_uri_from_config(config_path)
+        if config_uri:
+            return config_uri
+        
+        fallback_uri = "s3://spaceport-ml-processing/3dgs/20f35078-d929-4f9f-9608-ad6235f713fe/ml-job-20250731-182052-20f35078-3dgs/output/model.tar.gz"
+        logger.warning("⚠️ Falling back to legacy July 31st 3DGS output")
+        return fallback_uri
+
+    def _load_uri_from_config(self, config_path: Optional[str]) -> Optional[str]:
+        """Load the latest 3DGS output URI from JSON config."""
+        candidate_paths = []
+        if config_path:
+            candidate_paths.append(Path(config_path))
+        default_path = Path(__file__).resolve().parent / "pipeline" / "latest_3dgs_output.json"
+        candidate_paths.append(default_path)
+        
+        for path in candidate_paths:
+            try:
+                if not path.is_file():
+                    continue
+                with open(path, "r") as handle:
+                    metadata = json.load(handle)
+                uri = metadata.get("s3_uri")
+                if uri:
+                    self.latest_metadata = metadata
+                    logger.info(f"📄 Loaded latest 3DGS metadata from {path}")
+                    return uri
+            except Exception as exc:
+                logger.error(f"❌ Failed to read config {path}: {exc}")
+        return None
 
     def _monitor_compression_job(self, job_name: str) -> Dict:
         """Monitor SOGS compression job progress"""
@@ -333,8 +396,22 @@ class SOGSCompressionTester:
 
 def main():
     """Run SOGS compression test"""
+    parser = argparse.ArgumentParser(description="Run PlayCanvas SOGS compression on an existing 3DGS output")
+    parser.add_argument(
+        "--source-uri",
+        help="S3 URI pointing to model.tar.gz exported by the 3DGS container"
+    )
+    parser.add_argument(
+        "--config",
+        help="Path to JSON file containing the latest 3DGS output metadata"
+    )
+    args = parser.parse_args()
+
     try:
-        tester = SOGSCompressionTester()
+        tester = SOGSCompressionTester(
+            source_uri=args.source_uri,
+            config_path=args.config
+        )
         results = tester.test_sogs_compression()
         
         logger.info("🏁 SOGS COMPRESSION TEST COMPLETE")

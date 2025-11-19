@@ -1,0 +1,7 @@
+{
+  "job_id": "3dgs-test-1763406269",
+  "training_job_name": "ml-job-20251117-120429-3dgs-tes-3dgs",
+  "s3_uri": "s3://spaceport-ml-processing/3dgs/3dgs-test-1763406269/ml-job-20251117-120429-3dgs-tes-3dgs/output/model.tar.gz",
+  "updated": "2025-11-18T18:00:00Z",
+  "notes": "Latest 3DGS output (Nov 17) verified for SOGS compatibility"
+}
