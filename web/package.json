@@ -19,6 +19,7 @@
   "type": "module",
   "dependencies": {
     "@cloudflare/next-on-pages": "1.13.13",
+    "@playcanvas/supersplat-viewer": "^1.8.3",
     "@react-three/drei": "^9.113.7",
     "@react-three/fiber": "^8.15.16",
     "@sentry/nextjs": "^10.12.0",
