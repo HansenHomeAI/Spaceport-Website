@@ -45,6 +45,7 @@ tmux new -s codex 'scripts/codex-loop.sh'
   - If a secret needs to change, document the exact key/value and pause for maintainer approval—do not edit secrets yourself.
 - Disable tests or drop coverage to "make it pass".
 - Commit binaries larger than 5 MB.
+- **Never build containers locally.** If there is an edit to the containers, Containers are built automatically by GitHub Actions on push. We never build on our local machine.
 
 ## Project Structure & Module Organization
 `web/` holds the Next.js App Router (`app/`), shared `components/`, helpers in `lib/`, and static `public/`. `infrastructure/` covers CDK stacks, Lambda code, and container contexts; `scripts/` hosts automation; `tests/` contains regression suites.
