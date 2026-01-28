@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spaceport AI</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/SpaceportIcons/SpaceportSocialIcon.PNG">
+  <!-- External stylesheet reference -->
+  <link rel="stylesheet" href="/styles.css">
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+  <!-- Preload first carousel images -->
+  <link rel="preload" as="image" href="assets/2.png">
+  <link rel="preload" as="image" href="assets/6.png">
+  <link rel="preload" as="image" href="assets/4.png">
+  <link rel="preload" as="image" href="assets/MirrRanchGroup2.png">
+
+  <!-- Waitlist Toggle - Set to true for production waitlist mode -->
+  <!-- Trigger Pages rebuild - Privacy modal should now be visible -->
+  <script>
+    const WAITLIST_MODE = true; // Set to true to enable waitlist mode
+  </script>
+
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <!-- Logo on the left -->
+      <div class="logo" onclick="showSection('landing')">
+        <img src="assets/SpaceportIcons/SpaceportFullLogoWhite.svg" alt="Spaceport AI" class="logo-image">
+      </div>
+
+      <!-- Desktop nav on the right -->
+      <div class="nav-links-desktop">
+        <a onclick="showSection('pricing')">Pricing</a>
+        <a onclick="showSection('about')">About</a>
+        <a onclick="showSection('create')">Create</a>
+      </div>
+
+      <!-- Toggle (+ / X) for small screens -->
+      <div class="toggle" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- Nav links for small screens -->
+    <div class="nav-links">
+      <a onclick="showSection('pricing')">Pricing</a>
+      <a onclick="showSection('about')">About</a>
+      <a onclick="showSection('create')">Create</a>
+    </div>
+  </header>
+
+  <!-- LANDING SECTION -->
+  <section class="section" id="landing">
+    <iframe class="landing-iframe" src="https://hansenhomeai.github.io/WebbyDeerKnoll/"></iframe>
+    <!-- Invisible Overlay to prevent unintended interactions -->
+    <div id="iframe-overlay"></div>
+    <div class="landing-content">
+      <h1>Location. Visualized in 3D.</h1>
+      <a href="https://10716eforestcreekrd.hansentour.com" class="cta-button with-symbol">
+        <img src="assets/3DSymbol.svg" class="symbol-3d" alt="" aria-hidden="true">
+        View example
+      </a>    
+    </div>
+  </section>
+
+  <!-- LOGO CAROUSEL SECTION -->
+  <section class="section hidden" id="landing-carousel">
+  <div class="logo-carousel">
+    <div class="logos">
+      <img loading="eager" src="assets/2.png" alt="Customer 1 Logo">
+      <img loading="eager" src="assets/6.png" alt="Customer 2 Logo">
+      <img loading="eager" src="assets/4.png" alt="Customer 3 Logo">
+      <img loading="eager" src="assets/MirrRanchGroup2.png" alt="Customer 7 Logo">
+      <img loading="lazy" src="assets/3.png" alt="Customer 4 Logo">
+      <img loading="lazy" src="assets/MullinRealEstate2.png" alt="Customer 9 Logo">
+      <img loading="lazy" src="assets/5.png" alt="Customer 5 Logo">
+      <img loading="lazy" src="assets/1.png" alt="Customer 6 Logo">      
+
+      <img loading="lazy" src="assets/2.png" alt="Customer 1 Logo">
+      <img loading="lazy" src="assets/6.png" alt="Customer 2 Logo">
+      <img loading="lazy" src="assets/4.png" alt="Customer 3 Logo">
+      <img loading="lazy" src="assets/MirrRanchGroup2.png" alt="Customer 7 Logo">
+      <img loading="lazy" src="assets/3.png" alt="Customer 4 Logo">
+    </div>
+  </div>
+  </section>
+
+  <!-- LANDING-ADDITIONAL (two-col) -->
+  <section class="section two-col-section hidden" id="landing-additional">
+    <div class="two-col-content">
+      <h2>Show what matters most to buyers.</h2>
+      <div class="right-col">
+        <p>Captivate buyers for longer with interactive 3D models that capture not just a building, but its location. View your property as if you're right there—feeling the neighborhood and natural flow around it.</p>
+        <a href="https://deer-knoll-dr.hansentour.com" class="cta-button2-fixed with-symbol" target="_blank">
+          <img src="assets/3DSymbol.svg" class="symbol-3d" alt="" aria-hidden="true">
+          View example
+        </a>      
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW STATS SECTION -->
+  <section class="section hidden" id="landing-stats">
+    <h2>Virtual experiences work.</h2>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <h1>95%</h1>
+        <p>Are more likely to contact listings with 3D tours.</p>
+      </div>
+      <div class="stat-box">
+        <h1>99%</h1>
+        <p>See 3D tours as a competitive edge.</p>
+      </div>
+      <div class="stat-box">
+        <h1>82%</h1>
+        <p>Consider switching agents if a 3D tour is offered.</p>
+      </div>
+    </div>
+    <p class="stats-source">National Association of Realtors</p>
+  </section>
+
+  <!-- LANDING-MORE (two-col) -->
+  <section class="section two-col-section hidden" id="landing-more">
+    <div class="two-col-content">
+      <h2>The future of property listings.</h2>
+      <div class="right-col">
+        <p>Photos and 3D tours only show parts of a property—never the full picture. We create interactive models that let you explore the land, surroundings, and location in a way <span class="inline-white">no photo or video can match.</span></p>
+        <a href="https://dolan-road.hansentour.com" class="cta-button2-fixed with-symbol" target="_blank">
+          <img src="assets/3DSymbol.svg" class="symbol-3d" alt="" aria-hidden="true">
+          View example
+        </a> 
+      </div>
+    </div>
+  </section>
+
+  <!-- LANDING-MORE2 (two-col) -->
+  <section class="section two-col-section hidden" id="landing-more2">
+    <div class="two-col-content">
+      <h2>Effortless creation with your drone.</h2>
+      <div class="right-col">
+        <p>Creating your 3D model is effortless. Our system autonomously flies your drone, capturing the perfect shots with zero skill required. Simply upload your photos, and you'll receive the completed model straight to your inbox.</p>
+        <a onclick="showSection('create')" class="cta-button2-fixed">Create your own</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hidden" id="landing-stats2">
+    <div class="stats-grid">
+      <div class="stat-box2 grainy">
+        <img src="assets/SpaceportIcons/SpaceportFullLogoWhite.svg" alt="Spaceport Logo">
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING HEADER -->
+  <section class="section hidden" id="pricing-header">
+    <h1>Pricing.</h1>
+    <p><span class="inline-white">Be among the first to capture the imagination of your buyers like never before. Each model includes a 1-month free trial for the $29/mo hosting.</span></p>
+  </section>
+
+  <!-- PRICING GRID -->
+  <section class="section hidden" id="pricing">
+    <div class="pricing-grid">
+      <!-- Remote Flight Card -->
+      <div class="pricing-card">
+        <h2>Autonomous capture.</h2>
+        <div class="price">$599</div>
+        <p>Your drone follows an automated flight path—no hassle, no extra gear. We train the neural network and host the embeddable link. Hosting continues at $29/month after your free first month.</p>
+        <a onclick="showSection('create')" class="cta-button">Create your model</a>
+      </div>
+      <!-- Enterprise Card -->
+      <div class="pricing-card">
+        <h2>Custom.</h2>
+        <p>High-volume or specialized projects? We'll create a tailored plan to meet your needs.</p>
+        <a
+          onclick="window.location.href='mailto:gabriel@spcprt.com?subject=Custom%20Pricing%20Inquiry&body=Hello%2C%20I%27m%20interested%20in%20learning%20more%20about%20custom%20pricing%20options%20at%20Spaceport.'"
+          class="cta-button"
+        >
+          Contact Us
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT (two-col) -->
+  <section class="section two-col-section hidden" id="about">
+    <h1>About Spaceport AI.</h1>
+    <p><span class="inline-white">Real estate is all about location—yet most listings fail to showcase it properly. Photos and 3D tours capture the inside of a home well, but they leave out what matters most: the context, the surroundings, the feel of the space.</span></p>
+    <div class="right-col">
+      <p><span class="inline-white">That's where Spaceport AI comes in.</span></p>
+    </div>
+  </section>
+
+  <!-- ABOUT-MISSION (two-col) -->
+  <section class="section two-col-section hidden" id="about-mission">
+    <div class="two-col-content">
+      <h2>How it works.</h2>
+      <div class="right-col">
+        <p><span class="inline-white">Plan your flight</span> – A drone pilot generates a flight path right here on our platform.</p>
+        <p><span class="inline-white">Capture and upload</span> – The drone follows the path, taking photos, which are then uploaded back to us.</p>
+        <p><span class="inline-white">Get your model</span> – We train a neural network on the images, and within 3 days, you receive a fully immersive 3D model straight to your inbox.</p>
+        <a onclick="showSection('create')" class="cta-button2-fixed">Create your own</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT-INNOVATION (two-col) -->
+  <section class="section two-col-section hidden" id="about-innovation">
+    <div class="two-col-content">
+      <h2>Bringing AI to real estate.</h2>
+      <div class="right-col">
+        <p>Noticing firsthand how listings fail to capture what buyers actually care about, 20-year-old founder Gabriel Hansen set out to fix it. Teaching himself computer science from the ground up, he built Spaceport—combining advances in neural networks with drone technology to create a whole new way to showcase location. </p>
+        <p>Our mission is simple: make the best tool for property marketing.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATE SECTION - Waitlist Mode Toggle -->
+  <section class="section hidden" id="create">
+    <!-- Waitlist Content (shown when WAITLIST_MODE is true) -->
+    <div id="waitlist-content" class="waitlist-container" style="display: none;">
+      <div class="waitlist-card">
+        <div class="waitlist-header">
+          <img src="assets/SpaceportIcons/SpaceportFullLogoWhite.svg" alt="Spaceport AI" class="waitlist-logo">
+          <h1>Join the waitlist for early access</h1>
+          <p>Be among the first to experience the future of property visualization. We'll notify you when Spaceport AI is ready for launch.</p>
+        </div>
+        
+        <form class="waitlist-form" onsubmit="submitWaitlist(event)">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="waitlist-name" 
+              name="name" 
+              placeholder="Name" 
+              required
+              class="waitlist-input"
+            >
+          </div>
+          
+          <div class="input-group">
+            <input 
+              type="email" 
+              id="waitlist-email" 
+              name="email" 
+              placeholder="Email Address" 
+              required
+              class="waitlist-input"
+            >
+          </div>
+          
+          <button type="submit" class="waitlist-submit-btn">
+            <span id="waitlist-btn-text">Join Waitlist</span>
+            <div id="waitlist-spinner" class="spinner" style="display:none;"></div>
+          </button>
+          
+          <div class="waitlist-terms">
+            <p>By joining the waitlist, you agree to our <a href="#" class="privacy-policy-link">Privacy Policy</a>.</p>
+          </div>
+        </form>
+        
+        <div id="waitlist-success" class="waitlist-success" style="display: none;">
+          <div class="success-icon">✓</div>
+          <h3>You're on the list!</h3>
+          <p>Thank you for your interest in Spaceport AI. We'll be in touch soon with early access details.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Development Content (shown when WAITLIST_MODE is false) -->
+    <div id="development-content">
+      <h1>Create your space.</h1>
+      <p><span class="inline-white">Transform your listings with ease. This streamlined workflow guides you from drone-captured imagery to a fully immersive 3D model.</span></p>
+      <p>Compatible with: Mini 2, Mini SE (version 1 only), Air 2S, Mavic Mini 1, Mavic Air 2, Mavic 2 (Zoom/Pro), Mavic (Air/Pro), Phantom 4 (Standard/Advanced/Pro/ProV2), Phantom 3 (Standard/4K/Advanced/Professional), Inspire 1 (X3/Z3/Pro/RAW), Inspire 2 and Spark.</p>
+      <p>Unsupported hardware: Air 3 and Mavic 3, as there is no SDK for these yet. DJI RC1/RC2 (with built-in screen), as it's not possible to install apps on it.</p>
+    </div>
+  </section>
+
+  <!-- PRIVACY POLICY MODAL -->
+  <div id="privacy-policy-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Privacy Policy</h2>
+        <button class="modal-close" onclick="closePrivacyPolicy()">×</button>
+      </div>
+      <div class="modal-body">
+        <h3>Spaceport AI Privacy Policy</h3>
+        <p><strong>Last updated:</strong> January 2025</p>
+        
+        <h4>Information We Collect</h4>
+        <p>When you join our waitlist, we collect:</p>
+        <ul>
+          <li>Your name and email address</li>
+          <li>Information about your interest in our services</li>
+        </ul>
+        
+        <h4>How We Use Your Information</h4>
+        <p>We use the information you provide to:</p>
+        <ul>
+          <li>Add you to our waitlist for early access</li>
+          <li>Send you updates about Spaceport AI launch</li>
+          <li>Provide customer support and respond to inquiries</li>
+        </ul>
+        
+        <h4>Data Protection</h4>
+        <p>We implement appropriate security measures to protect your personal information. Your data is stored securely and we do not sell, trade, or otherwise transfer your personal information to third parties.</p>
+        
+        <h4>Your Rights</h4>
+        <p>You have the right to:</p>
+        <ul>
+          <li>Access your personal information</li>
+          <li>Request correction of your data</li>
+          <li>Request deletion of your data</li>
+          <li>Unsubscribe from communications</li>
+        </ul>
+        
+        <h4>Contact Us</h4>
+        <p>If you have any questions about this Privacy Policy, please contact us at privacy@spaceport.ai</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <section class="section hidden" id="create-dashboard">
+    <h2>Dashboard</h2>
+    <p><span class="inline-white">Monitor your 3D model creation progress and manage your projects.</span> Track processing status, view completed models, and access all your project files in one centralized location.</p>
+    
+    <div class="project-cards">
+      <div class="project-box new-project-card">
+        <h1>New Project<span class="plus-icon"><span></span><span></span></span></h1>
+      </div>
+      <div class="project-box">
+        <button class="project-controls-btn" tabindex="0" aria-label="Edit project">
+          <img src="assets/SpaceportIcons/Controls.svg" class="project-controls-icon" alt="Edit controls" />
+        </button>
+        <h1>Downtown Property</h1>
+        <p>Processing - Neural network training in progress.</p>
+      </div>
+      <div class="project-box">
+        <button class="project-controls-btn" tabindex="0" aria-label="Edit project">
+          <img src="assets/SpaceportIcons/Controls.svg" class="project-controls-icon" alt="Edit controls" />
+        </button>
+        <h1>Lakeside Home</h1>
+        <p>Complete - Ready for deployment.</p>
+      </div>
+      <div class="project-box">
+        <button class="project-controls-btn" tabindex="0" aria-label="Edit project">
+          <img src="assets/SpaceportIcons/Controls.svg" class="project-controls-icon" alt="Edit controls" />
+        </button>
+        <h1>Mountain View Estate</h1>
+        <p>Processing - Structure from Motion in progress.</p>
+      </div>
+      <div class="project-box">
+        <button class="project-controls-btn" tabindex="0" aria-label="Edit project">
+          <img src="assets/SpaceportIcons/Controls.svg" class="project-controls-icon" alt="Edit controls" />
+        </button>
+        <h1>Historic Courthouse</h1>
+        <p>Complete - Hosting at spaceport.ai</p>
+      </div>
+      <div class="project-box">
+        <button class="project-controls-btn" tabindex="0" aria-label="Edit project">
+          <img src="assets/SpaceportIcons/Controls.svg" class="project-controls-icon" alt="Edit controls" />
+        </button>
+        <h1>Riverside Ranch</h1>
+        <p>Failed - Insufficient image coverage detected.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW PROJECT POPUP -->
+  <div id="newProjectPopup" class="popup-overlay hidden">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-title-section">
+        <textarea id="projectTitle" class="popup-title-input" rows="1" placeholder="Untitled"></textarea>
+        <span class="edit-icon"></span>
+      </div>
+      <button class="popup-close" onclick="closeNewProjectPopup()"></button>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="popup-content-scroll">
+        
+        <!-- SECTION 1: CREATE FLIGHT PLAN -->
+        <div class="accordion-section active" data-section="setup">
+          <div class="accordion-header" onclick="toggleAccordionSection('setup')">
+            <div class="accordion-title">
+              <h3>Create Flight Plan</h3>
+            </div>
+            <span class="accordion-chevron"></span>
+          </div>
+          <div class="accordion-content">
+            <!-- Map Section -->
+            <div class="popup-map-section">
+              <div id="map-container" class="map-container">
+                <!-- Expand button (moved inside map container for fullscreen) -->
+                <button class="expand-button" id="expand-button">
+                  <span class="expand-icon"></span>
+                </button>
+                <div class="map-dim-overlay"></div>
+                <!-- Add blur background -->
+                <div class="map-blur-background"></div>
+                <!-- Progressive blur overlays -->
+                <div class="map-blur-overlay top"></div>
+                <div class="map-blur-overlay bottom"></div>
+                <!-- Progressive bottom blur for seamless edge blending -->
+                <div class="map-progressive-bottom-blur"></div>
+                
+                <!-- Centered instructions -->
+                <div class="map-instructions-center" id="map-instructions">
+                  <div class="instruction-content">
+                    <div class="instruction-pin"></div>
+                    <h3>Select the focus point for your drone flight.</h3>
+              </div>
+                </div>
+                
+                <!-- Address Search Bar (overlay on map) -->
+                <div class="address-search-overlay">
+                  <div class="address-search-wrapper">
+                    <input type="text" id="address-search" class="text-fade-right" placeholder="Enter location" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Batteries Section -->
+            <div class="category-outline">
+              <div class="popup-section">
+                <h4>Batteries</h4>
+                <div class="input-row-popup">
+                  <div class="popup-input-wrapper">
+                    <span class="input-icon time"></span>
+                    <input type="text" class="text-fade-right" placeholder="Duration" data-suffix=" min/battery" />
+                  </div>
+                  <div class="popup-input-wrapper">
+                    <span class="input-icon number"></span>
+                    <input type="text" class="text-fade-right" placeholder="Quantity" data-suffix=" battery" data-plural=" batteries" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Altitude Section -->
+            <div class="category-outline">
+              <div class="popup-section">
+                <h4>Altitude</h4>
+                <div class="input-row-popup">
+                  <div class="popup-input-wrapper">
+                    <span class="input-icon minimum"></span>
+                    <input type="text" class="text-fade-right" placeholder="Minimum" data-suffix=" ft AGL" />
+                  </div>
+                  <div class="popup-input-wrapper">
+                    <span class="input-icon maximum"></span>
+                    <input type="text" class="text-fade-right" placeholder="Maximum" data-suffix=" ft AGL" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Flight Paths Section -->
+            <div class="category-outline">
+              <div class="popup-section">
+                <h4>Flight Paths</h4>
+                <div id="flight-path-buttons" class="flight-path-grid">
+                  <!-- Dynamic buttons will be generated here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: PROPERTY UPLOAD -->
+        <div class="accordion-section" data-section="upload">
+          <div class="accordion-header" onclick="toggleAccordionSection('upload')">
+            <div class="accordion-title">
+              <h3>Property Upload</h3>
+            </div>
+            <span class="accordion-chevron"></span>
+          </div>
+          <div class="accordion-content">
+            <div class="popup-section">
+              
+              <div class="category-outline">
+                <div class="popup-section">
+                  <div class="upload-zone">
+                    <div class="upload-icon"></div>
+                    <p>Upload .jpg photos as a .zip file</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-outline">
+                <div class="popup-section">
+                  <h4>Property Details</h4>
+                  <div class="input-row-popup">
+                    <div class="popup-input-wrapper">
+                      <span class="input-icon home"></span>
+                      <input type="text" class="text-fade-right" placeholder="Property Title" />
+                    </div>
+                  </div>
+                  <div class="popup-input-wrapper listing-description-wrapper">
+                    <span class="input-icon paragraph"></span>
+                    <textarea id="listingDescription" class="text-fade-right" placeholder="Listing Description" rows="3"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-outline">
+                <div class="popup-section">
+                  <h4>Delivery Method</h4>
+                  <div class="input-row-popup">
+                    <div class="popup-input-wrapper">
+                      <span class="input-icon email"></span>
+                      <input type="email" class="text-fade-right" placeholder="Email Address" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-outline upload-button-only no-outline">
+                <div class="popup-section" style="display: flex; justify-content: center; position: relative;">
+                  <div class="upload-progress-text">0%</div>
+                  <div class="upload-button-container">
+                    <button class="upload-btn-with-icon">
+                      <span class="upload-btn-icon"></span>
+                      Upload
+                    </button>
+                    <button class="cancel-btn-with-icon">
+                      <span class="cancel-btn-icon"></span>
+                      Cancel
+                    </button>
+                  </div>
+                  <div class="upload-progress-container">
+                    <div class="upload-progress-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: MODEL DELIVERY -->
+        <!-- Model Delivery section removed as requested -->
+
+      </div>
+  </div>
+  
+  <section class="section hidden" id="create-steps1">
+    <div class="flight-path-section">
+        <div class="two-col-content">
+          <div class="left-col">
+            <h2 class="flight-path-title">Step 1: plan your drone flight.</h2>
+          </div>
+          <div class="right-col">
+            <p>Our advanced algorithm creates exponential spiral flight patterns optimized for battery duration and neural network training. The system automatically calculates the perfect flight path that captures differentiated altitude data for maximum photo quality while respecting your constraints.</p>
+            <p>Each battery flies one complete slice of the pattern for optimal coverage. The system uses intelligent battery optimization with 95% utilization safety margin and neural network-optimized altitude logic for superior 3D model quality.</p>
+            </div>
+        </div>
+  </div>
+  
+<!-- Enhanced Drone Path Generator -->
+<div id="dfpg-container" class="dfpg-container">
+  <div class="dfpg-container-inner">
+    
+    <!-- Location Section -->
+    <div class="dfpg-header">
+      <div class="header-title-group">
+        <h2>
+          Location & Mission
+          <span class="info-wrapper">
+            <span class="info-pill-icon" data-tooltip-target="tooltipLocation">info</span>
+          </span>
+        </h2>
+      </div>
+      <div class="info-tooltip" id="tooltipLocation">
+        <p>Enter your mission details and center coordinates. The system will fetch real-time elevation data and optimize the flight path for your specific location and battery constraints.</p>
+      </div>
+    </div>
+
+    <form id="optimizedCoordinateForm">
+      <div class="input-row">
+        <div class="input-wrapper" data-label="Mission Title">
+          <input 
+            type="text" 
+            id="missionTitle" 
+            name="missionTitle" 
+            placeholder="Enter mission name (e.g., 'Downtown Property Survey')"
+          >
+          <div class="hover-overlay"></div>
+        </div>
+        <div class="input-wrapper" data-label="Center Coordinates">
+          <input 
+            type="text" 
+            id="centerCoordinates" 
+            name="centerCoordinates" 
+            placeholder="GPS coordinates (e.g., 41.73218, -111.83979 or 41.73218° N, 111.83979° W)"
+            required
+          >
+          <div class="hover-overlay"></div>
+        </div>
+      </div>
+
+      <!-- Battery & Constraints Section -->
+      <h2>
+        Flight Parameters
+        <span class="info-wrapper">
+          <span class="info-pill-icon" data-tooltip-target="tooltipFlight">info</span>
+        </span>
+      </h2>
+      <div class="info-tooltip" id="tooltipFlight">
+        <p>Set your battery capacity and altitude constraints. The system will automatically optimize the spiral pattern for maximum coverage within your constraints, using advanced exponential curves and neural network training optimizations.</p>
+      </div>
+
+      <div class="input-row">
+        <div class="input-wrapper" data-label="Flight Duration Per Battery">
+          <input 
+            type="number" 
+            id="batteryMinutes" 
+            name="batteryMinutes" 
+            placeholder="Flight duration per battery (default: 20 minutes)"
+            min="10"
+            max="60"
+            step="1"
+            required
+          >
+          <div class="hover-overlay"></div>
+        </div>
+        <div class="input-wrapper" data-label="Total Number of Batteries">
+          <input 
+            type="number" 
+            id="numBatteries" 
+            name="numBatteries" 
+            placeholder="Number of batteries available (default: 3)"
+            min="1"
+            max="12"
+            step="1"
+            required
+          >
+          <div class="hover-overlay"></div>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-wrapper" data-label="Minimum Safe Flying Height">
+          <input 
+            type="number" 
+            id="minHeightFeet" 
+            name="minHeightFeet" 
+            placeholder="Minimum altitude above ground (default: 100 ft)"
+            min="50"
+            max="300"
+            step="10"
+          >
+          <div class="hover-overlay"></div>
+        </div>
+        <div class="input-wrapper" data-label="Maximum Flying Height (Optional)">
+          <input 
+            type="number" 
+            id="maxHeightFeet" 
+            name="maxHeightFeet" 
+            placeholder="Maximum altitude limit (optional, default: 400 ft)"
+            min="200"
+            max="1000"
+            step="10"
+          >
+          <div class="hover-overlay"></div>
+        </div>
+      </div>
+
+      <!-- Optimization Section -->
+      <div class="optimization-section">
+        <h2>
+          Optimization Results
+          <span class="info-wrapper">
+            <span class="info-pill-icon" data-tooltip-target="tooltipOptimization">info</span>
+          </span>
+        </h2>
+        <div class="info-tooltip" id="tooltipOptimization">
+          <p>Click "Optimize Flight Plan" to generate the perfect spiral pattern for your constraints. The system uses intelligent balanced scaling and binary search algorithms to maximize coverage while respecting battery limitations.</p>
+        </div>
+
+        <button type="button" id="optimizeButton" class="optimize-btn">
+          <span id="optimizeButtonText">Optimize Flight Plan</span>
+          <div id="optimizeSpinner" class="spinner" style="display: none;"></div>
+        </button>
+
+        <div id="optimizationResults" class="optimization-results" style="display: none;">
+          <div class="results-grid">
+            <div class="result-item">
+              <span class="result-label">Pattern Type:</span>
+              <span id="patternType" class="result-value">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Bounces (Direction Changes):</span>
+              <span id="numBounces" class="result-value">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Flight Radius:</span>
+              <span id="flightRadius" class="result-value">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Estimated Flight Time:</span>
+              <span id="estimatedTime" class="result-value">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Battery Utilization:</span>
+              <span id="batteryUtilization" class="result-value">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Ground Elevation:</span>
+              <span id="groundElevation" class="result-value">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="optimizationError" class="error-message" style="display: none;">
+          <p id="optimizationErrorText"></p>
+        </div>
+      </div>
+
+      <!-- Download Section -->
+      <h2>
+        Download Mission Files
+        <span class="info-wrapper">
+          <span class="info-pill-icon" data-tooltip-target="tooltipDownload">info</span>
+        </span>
+      </h2>
+      <div class="info-tooltip" id="tooltipDownload">
+        <p>Download the complete mission as a master CSV file, or individual battery segments for multi-battery missions. Files are compatible with Litchi Mission Hub and include elevation-aware altitudes with neural network optimization.</p>
+      </div>
+
+      <div class="download-section">
+        <button type="button" id="downloadMasterCSV" class="download-btn" style="display: none;" disabled>
+          <span>📁 Download Master CSV</span>
+        </button>
+
+        <div id="batteryDownloads" class="battery-downloads" style="display: none;">
+          <p class="download-label">Individual Battery Segments:</p>
+          <div id="batteryButtons" class="battery-buttons"></div>
+        </div>
+      </div>
+
+      <div id="missionLogs" class="mission-logs" style="display: none;">
+        <h3>Mission Details</h3>
+        <div id="logContent"></div>
+      </div>
+    </form>
+  </div>
+</div>
+</section>
+
+<section class="section hidden" id="create-steps2">
+  <div class="flight-path-section">
+      <div class="two-col-content">
+        <div class="left-col">
+          <h2 class="flight-path-title">Step 2: upload drone photos.</h2>
+        </div>
+        <div class="right-col">
+          <p>Enter the relevant info to create the model. If you'd like property lines or embeded name tags, include the site map documents within the drone photos zip file, and make mention in the "optional notes" field.</p>
+        </div>
+      </div>
+</div>
+    
+<!-- CHUNK #1: dronePhotoUploader.html (HTML snippet) -->
+<div id="dpu-container" class="dpu-container">
+  <div class="dpu-container-inner">
+
+    <!-- Title of property -->
+    <div class="input-wrapper">
+      <input
+        type="text"
+        id="propertyTitle"
+        placeholder="Title of property"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Address of property -->
+    <div class="input-wrapper">
+      <input
+        type="text"
+        id="addressOfProperty"
+        placeholder="Address of property"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Listing description -->
+    <div class="input-wrapper">
+      <textarea
+        id="listingDescription"
+        rows="4"
+        placeholder="Listing description..."
+      ></textarea>
+    </div>
+
+    <!-- Drag & Drop / File Select for .zip -->
+    <div id="uploadArea" class="upload-area">
+      <p id="uploadPrompt">Drag & drop .zip files here, or click to select</p>
+      <p>(Max 5GB total)</p>
+
+      <!-- Hidden by default, shown once a file is selected -->
+      <p id="selectedFileDisplay" style="display:none;">
+        Selected file: <span id="selectedFileName"></span>
+        <span id="removeFileBtn" class="close-icon">&times;</span>
+      </p>
+
+      <input 
+        type="file" 
+        id="fileInput" 
+        accept=".zip"
+        style="display:none"
+      />
+    </div>
+
+    <!-- Email field -->
+    <div class="input-wrapper">
+      <input
+        type="email"
+        id="emailField"
+        placeholder="Your email"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Optional notes -->
+    <div class="input-wrapper">
+      <textarea 
+        id="optionalNotes"
+        rows="3"
+        placeholder="Optional notes (e.g. desired lot lines, tags)..."
+      ></textarea>
+    </div>
+
+    <!-- Upload Button -->
+    <div class="input-row">
+      <button id="uploadBtn" class="dpu-btn">
+        Upload photos
+      </button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+  </div>
+</div>
+</div>
+  </section>
+
+  <!-- ML PROCESSING SECTION -->
+  <section class="section hidden" id="create-ml-processing">
+    <div class="flight-path-section">
+      <div class="two-col-content">
+        <div class="left-col">
+          <h2 class="flight-path-title">Alternative: Process existing S3 upload.</h2>
+        </div>
+        <div class="right-col">
+          <p>Already have drone photos uploaded to S3? Paste the S3 URL below to start ML processing directly. This will run your images through our advanced pipeline: Structure from Motion → 3D Gaussian Splatting → Compression.</p>
+          <div class="viewer-button-container">
+            <a href="/viewer_official_supersplat_new.html" target="_blank" class="viewer-button">
+              <img src="assets/3DSymbol.svg" class="viewer-button-icon" alt="" aria-hidden="true">
+              3D Viewer
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ML Processing Container -->
+    <div id="ml-container" class="dpu-container">
+      <div class="dpu-container-inner">
+        
+        <!-- Pipeline Step Selector -->
+        <div class="input-wrapper">
+          <label for="pipelineStepSelect" class="step-selector-label">Start from step:</label>
+          <select id="pipelineStepSelect" class="step-selector">
+            <option value="sfm">1. SfM Processing → 3D Gaussian Splatting → Compression</option>
+            <option value="3dgs">2. 3D Gaussian Splatting → Compression</option>
+            <option value="compression">3. Compression Only</option>
+          </select>
+        </div>
+
+        <!-- S3 URL Input -->
+        <div class="input-wrapper">
+          <input
+            type="url"
+            id="s3UrlInput"
+            placeholder="S3 URL (images zip for SfM, sparse reconstruction for 3DGS, or model for compression)"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- GPS CSV Data (for SfM) -->
+        <div class="input-wrapper" id="gpsCsvWrapper">
+          <label for="gpsCsvData" class="csv-data-label">GPS Flight Path Data (optional for SfM):</label>
+          <textarea
+            id="gpsCsvData"
+            rows="6"
+            placeholder="Paste GPS CSV data here for enhanced SfM processing...&#10;latitude,longitude,altitude(ft),heading(deg),curvesize(ft),rotationdir,gimbalmode,gimbalpitchangle,altitudemode,speed(m/s),poi_latitude,poi_longitude,poi_altitude(ft),poi_altitudemode,photo_timeinterval,photo_distinterval&#10;41.73272,-111.83423,130.0,249,14.48,0,2,-35,0,8.85,41.73231,-111.83423,-35,0,3.0,0"
+            class="csv-data-input"
+          ></textarea>
+        </div>
+
+        <!-- Email for notifications -->
+        <div class="input-wrapper">
+          <input
+            type="email"
+            id="mlEmailField"
+            placeholder="Email"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Processing Button -->
+        <div class="input-row">
+          <button id="startProcessingBtn" class="dpu-btn">
+            <span id="processingBtnText">Start Processing</span>
+            <div id="processingSpinner" class="spinner" style="display:none;"></div>
+          </button>
+        </div>
+
+        <!-- Status Display -->
+        <div id="processingStatus" style="display:none;">
+          <div class="job-status">
+            <h3>Processing Started!</h3>
+            <p><strong>Job ID:</strong> <span id="jobId"></span></p>
+            <p><strong>Status:</strong> <span id="jobStatus">Initializing...</span></p>
+            <p>We'll send you an email notification when processing is complete. This typically takes 2-6 hours depending on the size of your dataset.</p>
+          </div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="processingError" class="error-message" style="display:none;">
+          <h3>Processing Error</h3>
+          <p id="errorMessage"></p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATE-STEPS -->
+  <section class="section hidden" id="create-steps3">
+    <div>
+      <h2>Step 3: model processing.</h2>
+      <p>Sit tight—creating your model can take up to 3 days. We'll send a fully immersive 3D tour straight to your inbox once it's ready. If you run into any issues, just reach out using the feedback form below.</p>
+    </div>
+  </section>
+
+  <!-- Feedback Section -->
+  <div class="feedback-section">
+    <form class="feedback-form" onsubmit="sendFeedback(event)">
+      <input
+        type="text"
+        name="feedback"
+        class="feedback-input"
+        placeholder="How can we improve?">
+      <button type="submit" class="feedback-button cta-button2">Send feedback</button>
+    </form>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <img src="assets/SpaceportIcons/SpaceportFullLogoWhite.svg" alt="Spaceport AI" class="footer-logo">
+      <p>© 2025 Spaceport AI · All rights reserved</p>
+    </div>
+  </footer>
+
+  <!-- External script reference -->
+  <script src="/script.js"></script>
+
+  <!-- Add Existing Path Popup -->
+  <div id="addPathPopup" class="popup hidden">
+    <div class="popup-content">
+      <div class="popup-header">
+        <h2>Add Existing Path</h2>
+        <span class="close-icon" onclick="hideAddPathPopup()">×</span>
+      </div>
+      <div class="instructions">
+        <p>Upload a CSV file containing your flight path waypoints. The system will analyze the data and pre-fill the parameters for you.</p>
+      </div>
+      <div id="csvUploadArea" class="upload-area">
+        <p>Drag and drop your CSV file here</p>
+        <p class="file-format">or click to browse</p>
+        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+      </div>
+      <div id="parsingResults" class="parsing-results hidden">
+        <h3>Detected Parameters</h3>
+        <div id="detectedParams"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
